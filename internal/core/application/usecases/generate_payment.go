@@ -16,6 +16,18 @@ type GeneratePaymentUseCase struct {
 	GenerateQRCodeMP ports.MercadoPagoGenerateQRCode
 }
 
+func NewGeneratePaymentUseCase(
+	paymentRepo ports.PaymentRepository,
+	generateTokenMP ports.MercadoPagoGenerateToken,
+	generateQRCodeMP ports.MercadoPagoGenerateQRCode,
+) *GeneratePaymentUseCase {
+	return &GeneratePaymentUseCase{
+		PaymentRepo:      paymentRepo,
+		GenerateTokenMP:  generateTokenMP,
+		GenerateQRCodeMP: generateQRCodeMP,
+	}
+}
+
 func (u *GeneratePaymentUseCase) Execute(ctx context.Context, input dto.GeneratePaymentInputDTO) (dto.GeneratePaymentOutputDTO, error) {
 	payment, err := u.PaymentRepo.GetByExternalId(ctx, input.ExternalId)
 	if err != nil {

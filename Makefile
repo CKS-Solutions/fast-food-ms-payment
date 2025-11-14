@@ -8,6 +8,7 @@ install:
 
 build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -extldflags '-static'" -o bin/generate_payment cmd/generate_payment_lambda/main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -extldflags '-static'" -o bin/check_payment_status cmd/check_payment_status_lambda/main.go
 
 deploy: clean install build
 	sls deploy --verbose

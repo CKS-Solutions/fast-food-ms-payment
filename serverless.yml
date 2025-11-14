@@ -25,6 +25,14 @@ functions:
           path: /v1/payment/{external_id}
           method: POST
 
+  checkPaymentStatus:
+    handler: bin/check_payment_status
+    memorySize: 128
+    events:
+      - http:
+          path: /v1/payment/{external_id}
+          method: GET
+
 resources:
   Resources:
     PaymentsTable:

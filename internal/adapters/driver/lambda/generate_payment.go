@@ -14,7 +14,7 @@ type GeneratePaymentHandler struct {
 	useCase *usecases.GeneratePaymentUseCase
 }
 
-func NewGeneratePaymentHandler(useCase *usecases.GeneratePaymentUseCase) *GeneratePaymentHandler {
+func NewGeneratePaymentHandler(useCase *usecases.GeneratePaymentUseCase) APIGatewayHandler {
 	return &GeneratePaymentHandler{useCase: useCase}
 }
 

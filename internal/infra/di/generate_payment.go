@@ -20,10 +20,6 @@ func NewGeneratePaymentContainer(region infra_aws.AwsRegion, stage infra_aws.Aws
 	generateQRCodeMP := driven_mercadopago.NewMercadoPagoGenerateQRCode(smClient)
 
 	return &GeneratePaymentContainer{
-		GeneratePaymentUseCase: &usecases.GeneratePaymentUseCase{
-			PaymentRepo:      paymentRepo,
-			GenerateTokenMP:  generateTokenMP,
-			GenerateQRCodeMP: generateQRCodeMP,
-		},
+		GeneratePaymentUseCase: usecases.NewGeneratePaymentUseCase(paymentRepo, generateTokenMP, generateQRCodeMP),
 	}
 }
