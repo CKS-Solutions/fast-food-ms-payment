@@ -25,11 +25,10 @@ func NewPaymentRepository(client aws_internal.DynamoDBClient) ports.PaymentRepos
 const TABLE_NAME = "Payments"
 
 func (r *PaymentRepository) GetByExternalId(ctx context.Context, externalId string) (entities.Payment, error) {
-	out, err := r.client.Query(ctx, &dynamodb.QueryInput{
-		TableName:              aws.String(TABLE_NAME),
-		KeyConditionExpression: aws.String("external_id = :external_id"),
-		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":external_id": &types.AttributeValueMemberS{Value: externalId},
+	out, err := r.client.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: aws.String(TABLE_NAME),
+		Key: map[string]types.AttributeValue{
+			"external_id": &types.AttributeValueMemberS{Value: externalId},
 		},
 	})
 
@@ -37,12 +36,12 @@ func (r *PaymentRepository) GetByExternalId(ctx context.Context, externalId stri
 		return entities.Payment{}, err
 	}
 
-	if len(out.Items) == 0 {
+	if out.Item == nil {
 		return entities.Payment{}, nil
 	}
 
 	var payment entities.Payment
-	attributevalue.UnmarshalMap(out.Items[0], &payment)
+	attributevalue.UnmarshalMap(out.Item, &payment)
 
 	return payment, nil
 }

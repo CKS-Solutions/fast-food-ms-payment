@@ -9,17 +9,19 @@ type DynamoDBClient struct {
 	*dynamodb.Client
 }
 
-func NewDynamoDBClient(region string) *DynamoDBClient {
+func NewDynamoDBClient(region AwsRegion, stage AwsStage) *DynamoDBClient {
+	if stage != StageLocal {
+		return &DynamoDBClient{
+			Client: dynamodb.NewFromConfig(aws.Config{
+				Region: string(region),
+			}),
+		}
+	}
+
 	return &DynamoDBClient{
 		Client: dynamodb.NewFromConfig(aws.Config{
-			EndpointResolver: aws.EndpointResolverFunc(
-				func(service, region string) (aws.Endpoint, error) {
-					return aws.Endpoint{
-						URL: "http://localstack:4566",
-					}, nil
-				},
-			),
-			Region: region,
+			BaseEndpoint: aws.String(LOCALSTACK_ENDPOINT),
+			Region:       string(region),
 		}),
 	}
 }

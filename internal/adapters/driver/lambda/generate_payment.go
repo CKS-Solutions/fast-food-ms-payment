@@ -25,7 +25,19 @@ func (h *GeneratePaymentHandler) Handle(ctx context.Context, event events.APIGat
 	}
 
 	externalId := event.PathParameters["external_id"]
+	if externalId == "" {
+		return utils.HandleHTTPError(utils.HTTPBadRequest("missing external_id in path parameters")), nil
+	}
+
 	input.ExternalId = externalId
+
+	if input.Amount <= 0 {
+		return utils.HandleHTTPError(utils.HTTPBadRequest("amount must be greater than zero")), nil
+	}
+
+	if input.Description == "" {
+		return utils.HandleHTTPError(utils.HTTPBadRequest("description is required")), nil
+	}
 
 	res, err := h.useCase.Execute(ctx, input)
 	if err != nil {

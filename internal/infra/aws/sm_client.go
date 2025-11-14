@@ -9,17 +9,19 @@ type SMClient struct {
 	*secretsmanager.Client
 }
 
-func NewSMClient(region string) *SMClient {
+func NewSMClient(region AwsRegion, stage AwsStage) *SMClient {
+	if stage != StageLocal {
+		return &SMClient{
+			Client: secretsmanager.NewFromConfig(aws.Config{
+				Region: string(region),
+			}),
+		}
+	}
+
 	return &SMClient{
 		Client: secretsmanager.NewFromConfig(aws.Config{
-			EndpointResolver: aws.EndpointResolverFunc(
-				func(service, region string) (aws.Endpoint, error) {
-					return aws.Endpoint{
-						URL: "http://localstack:4566",
-					}, nil
-				},
-			),
-			Region: region,
+			BaseEndpoint: aws.String(LOCALSTACK_ENDPOINT),
+			Region:       string(region),
 		}),
 	}
 }

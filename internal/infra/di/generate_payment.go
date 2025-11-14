@@ -11,9 +11,9 @@ type GeneratePaymentContainer struct {
 	GeneratePaymentUseCase *usecases.GeneratePaymentUseCase
 }
 
-func NewGeneratePaymentContainer() *GeneratePaymentContainer {
-	dynamoClient := infra_aws.NewDynamoDBClient("us-east-1")
-	smClient := infra_aws.NewSMClient("us-east-1")
+func NewGeneratePaymentContainer(region infra_aws.AwsRegion, stage infra_aws.AwsStage) *GeneratePaymentContainer {
+	dynamoClient := infra_aws.NewDynamoDBClient(region, stage)
+	smClient := infra_aws.NewSMClient(region, stage)
 
 	paymentRepo := driven_dynamodb.NewPaymentRepository(*dynamoClient)
 	generateTokenMP := driven_mercadopago.NewMercadoPagoGenerateToken(smClient)
