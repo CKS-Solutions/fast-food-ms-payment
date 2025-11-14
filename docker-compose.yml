@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: main_localstack
+    image: localstack/localstack
+    ports:
+      - '4566:4566'
+      - '4571:4571'
+    environment:
+      - AWS_ACCESS_KEY_ID=key
+      - AWS_SECRET_ACCESS_KEY=secret
+      - AWS_DEFAULT_REGION=us-east-1
+      - SERVICES=dynamodb,lambda,iam,apigateway,cloudformation,logs,secretsmanager
+      - LAMBDA_EXECUTOR=docker-reuse
+      - DEBUG=1
+      - PERSISTENCE=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - localstack_network
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    container_name: dynamodb-admin
+    ports:
+      - '8007:8001'
+    environment:
+      - DYNAMO_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+    depends_on:
+      - localstack
+    networks:
+      - localstack_network
+
+volumes:
+  localstack_data:
+
+networks:
+  localstack_network:
+    driver: bridge
