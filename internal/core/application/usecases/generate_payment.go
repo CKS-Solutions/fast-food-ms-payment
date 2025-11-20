@@ -11,9 +11,9 @@ import (
 )
 
 type GeneratePaymentUseCase struct {
-	PaymentRepo      ports.PaymentRepository
-	GenerateTokenMP  ports.MercadoPagoGenerateToken
-	GenerateQRCodeMP ports.MercadoPagoGenerateQRCode
+	paymentRepo      ports.PaymentRepository
+	generateTokenMP  ports.MercadoPagoGenerateToken
+	generateQRCodeMP ports.MercadoPagoGenerateQRCode
 }
 
 func NewGeneratePaymentUseCase(
@@ -22,14 +22,14 @@ func NewGeneratePaymentUseCase(
 	generateQRCodeMP ports.MercadoPagoGenerateQRCode,
 ) *GeneratePaymentUseCase {
 	return &GeneratePaymentUseCase{
-		PaymentRepo:      paymentRepo,
-		GenerateTokenMP:  generateTokenMP,
-		GenerateQRCodeMP: generateQRCodeMP,
+		paymentRepo:      paymentRepo,
+		generateTokenMP:  generateTokenMP,
+		generateQRCodeMP: generateQRCodeMP,
 	}
 }
 
 func (u *GeneratePaymentUseCase) Execute(ctx context.Context, input dto.GeneratePaymentInputDTO) (dto.GeneratePaymentOutputDTO, error) {
-	payment, err := u.PaymentRepo.GetByExternalId(ctx, input.ExternalId)
+	payment, err := u.paymentRepo.GetByExternalId(ctx, input.ExternalId)
 	if err != nil {
 		return dto.GeneratePaymentOutputDTO{}, utils.HTTPInternalServerError("failed to get payment by external ID")
 	}
@@ -43,25 +43,25 @@ func (u *GeneratePaymentUseCase) Execute(ctx context.Context, input dto.Generate
 			return dto.GeneratePaymentOutputDTO{Code: payment.Code}, nil
 		}
 
-		err := u.PaymentRepo.Delete(ctx, payment.ExternalId)
+		err := u.paymentRepo.Delete(ctx, payment.ExternalId)
 		if err != nil {
 			return dto.GeneratePaymentOutputDTO{}, utils.HTTPInternalServerError("failed to delete expired payment")
 		}
 	}
 
-	token, err := u.GenerateTokenMP.GenerateToken(ctx)
+	token, err := u.generateTokenMP.GenerateToken(ctx)
 	if err != nil {
 		return dto.GeneratePaymentOutputDTO{}, utils.HTTPPreconditionFailed("failed to generate MercadoPago token")
 	}
 
-	qrCode, err := u.GenerateQRCodeMP.GenerateQRCode(ctx, input.ExternalId, input.Amount, input.Description, token)
+	qrCode, err := u.generateQRCodeMP.GenerateQRCode(ctx, input.ExternalId, input.Amount, input.Description, token)
 	if err != nil {
 		return dto.GeneratePaymentOutputDTO{}, utils.HTTPPreconditionFailed("failed to generate MercadoPago QR Code")
 	}
 
 	newPayment := entities.NewPayment(input.ExternalId, input.Amount, input.Description, qrCode)
 
-	err = u.PaymentRepo.Create(ctx, *newPayment)
+	err = u.paymentRepo.Create(ctx, *newPayment)
 	if err != nil {
 		return dto.GeneratePaymentOutputDTO{}, utils.HTTPInternalServerError("failed to create new payment")
 	}

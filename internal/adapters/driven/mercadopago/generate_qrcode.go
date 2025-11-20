@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -35,6 +36,8 @@ type GenerateQRCodeBody struct {
 	TotalAmount       float64                  `json:"total_amount"`
 	ExpirationDate    string                   `json:"expiration_date"`
 	Items             []GenerateQRCodeBodyItem `json:"items"`
+
+	NotificationURL string `json:"notification_url,omitempty"`
 }
 
 func NewMercadoPagoGenerateQRCode(smClient *infra_aws.SMClient) ports.MercadoPagoGenerateQRCode {
@@ -62,6 +65,11 @@ func (m *MercadoPagoGenerateQRCode) GenerateQRCode(
 				UnitMeasure: "unit",
 			},
 		},
+	}
+
+	stage := os.Getenv("STAGE")
+	if stage == string(infra_aws.StageLocal) {
+		input.NotificationURL = "define_here_to_test"
 	}
 
 	body, err := json.Marshal(input)

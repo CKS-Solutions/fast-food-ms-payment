@@ -9,6 +9,8 @@ provider:
   environment:
     REGION: ${self:provider.region}
     STAGE: ${self:provider.stage}
+    PAYMENTS_STATUS_TOPIC_ARN:
+      Ref: PaymentStatusTopic
 
 package:
   individually: true
@@ -18,7 +20,7 @@ package:
 
 functions:
   generatePayment:
-    handler: bin/generate_payment
+    handler: bin/generatePayment
     memorySize: 128
     events:
       - http:
@@ -26,12 +28,24 @@ functions:
           method: POST
 
   checkPaymentStatus:
-    handler: bin/check_payment_status
+    handler: bin/checkPaymentStatus
     memorySize: 128
     events:
       - http:
           path: /v1/payment/{external_id}
           method: GET
+
+  updatePaymentStatus:
+    handler: bin/updatePaymentStatus
+    memorySize: 128
+
+  webhookOrchestratorMP:
+    handler: bin/webhookOrchestratorMP
+    memorySize: 128
+    events:
+      - http:
+          path: /v1/mercadopago/webhook
+          method: POST
 
 resources:
   Resources:
@@ -46,6 +60,11 @@ resources:
           - AttributeName: external_id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+
+    PaymentStatusTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: PaymentStatusTopic
 
 plugins:
   - serverless-localstack

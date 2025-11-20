@@ -76,3 +76,19 @@ func (r *PaymentRepository) Delete(ctx context.Context, externalId string) error
 
 	return nil
 }
+
+func (r *PaymentRepository) UpdateStatusByExternalId(ctx context.Context, externalId string, status string) error {
+	_, err := r.client.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+		TableName: aws.String(TABLE_NAME),
+		Key: map[string]types.AttributeValue{
+			"external_id": &types.AttributeValueMemberS{Value: externalId},
+		},
+		UpdateExpression:          aws.String("SET #s = :status"),
+		ExpressionAttributeNames:  map[string]string{"#s": "status"},
+		ExpressionAttributeValues: map[string]types.AttributeValue{":status": &types.AttributeValueMemberS{Value: status}},
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

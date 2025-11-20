@@ -10,4 +10,5 @@ type PaymentRepository interface {
 	GetByExternalId(ctx context.Context, externalId string) (entities.Payment, error)
 	Create(ctx context.Context, payment entities.Payment) error
 	Delete(ctx context.Context, externalId string) error
+	UpdateStatusByExternalId(ctx context.Context, externalId string, status string) error
 }
