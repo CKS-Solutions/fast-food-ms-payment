@@ -20,7 +20,7 @@ func NewUpdatePaymentStatusContainer(region infra_aws.AwsRegion, stage infra_aws
 	paymentRepo := driven_dynamodb.NewPaymentRepository(*dynamoClient)
 	generateTokenMP := driven_mercadopago.NewMercadoPagoGenerateToken(smClient)
 	getPaymentMP := driven_mercadopago.NewMercadoPagoGetPayment()
-	notificationService := driven_sns.NewPaymentStatusSNS(snsClient)
+	notificationService := driven_sns.NewPaymentSNS(snsClient)
 
 	return &UpdatePaymentStatusContainer{
 		UpdatePaymentStatusUseCase: usecases.NewUpdatePaymentStatusWebhookUseCase(

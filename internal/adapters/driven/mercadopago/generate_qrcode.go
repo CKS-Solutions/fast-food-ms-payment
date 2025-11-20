@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -65,11 +64,6 @@ func (m *MercadoPagoGenerateQRCode) GenerateQRCode(
 				UnitMeasure: "unit",
 			},
 		},
-	}
-
-	stage := os.Getenv("STAGE")
-	if stage == string(infra_aws.StageLocal) {
-		input.NotificationURL = "define_here_to_test"
 	}
 
 	body, err := json.Marshal(input)

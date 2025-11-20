@@ -9,8 +9,8 @@ provider:
   environment:
     REGION: ${self:provider.region}
     STAGE: ${self:provider.stage}
-    PAYMENTS_STATUS_TOPIC_ARN:
-      Ref: PaymentStatusTopic
+    PAYMENT_TOPIC_ARN:
+      Ref: PaymentTopic
 
 package:
   individually: true
@@ -23,9 +23,12 @@ functions:
     handler: bin/generatePayment
     memorySize: 128
     events:
-      - http:
-          path: /v1/payment/{external_id}
-          method: POST
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PaymentQueue
+              - Arn
+          batchSize: 1
 
   checkPaymentStatus:
     handler: bin/checkPaymentStatus
@@ -61,10 +64,15 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
-    PaymentStatusTopic:
+    PaymentTopic:
       Type: AWS::SNS::Topic
       Properties:
-        TopicName: PaymentStatusTopic
+        TopicName: PaymentTopic
+
+    PaymentQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: PaymentQueue
 
 plugins:
   - serverless-localstack

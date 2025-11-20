@@ -10,23 +10,23 @@ import (
 )
 
 type UpdatePaymentStatusUseCase struct {
-	paymentRepository        ports.PaymentRepository
-	generateTokenMP          ports.MercadoPagoGenerateToken
-	getPaymentMP             ports.MercadoPagoGetPayment
-	updatePaymentStatusTopic ports.PaymentStatusTopic
+	paymentRepository ports.PaymentRepository
+	generateTokenMP   ports.MercadoPagoGenerateToken
+	getPaymentMP      ports.MercadoPagoGetPayment
+	paymentTopic      ports.PaymentTopic
 }
 
 func NewUpdatePaymentStatusWebhookUseCase(
 	paymentRepository ports.PaymentRepository,
 	generateTokenMP ports.MercadoPagoGenerateToken,
 	getPaymentMP ports.MercadoPagoGetPayment,
-	updatePaymentStatusTopic ports.PaymentStatusTopic,
+	paymentTopic ports.PaymentTopic,
 ) *UpdatePaymentStatusUseCase {
 	return &UpdatePaymentStatusUseCase{
-		paymentRepository:        paymentRepository,
-		generateTokenMP:          generateTokenMP,
-		getPaymentMP:             getPaymentMP,
-		updatePaymentStatusTopic: updatePaymentStatusTopic,
+		paymentRepository: paymentRepository,
+		generateTokenMP:   generateTokenMP,
+		getPaymentMP:      getPaymentMP,
+		paymentTopic:      paymentTopic,
 	}
 }
 
@@ -62,7 +62,7 @@ func (u *UpdatePaymentStatusUseCase) Execute(ctx context.Context, paymentId stri
 		return utils.HTTPInternalServerError("failed to update payment status")
 	}
 
-	err = u.updatePaymentStatusTopic.PublishPaymentStatus(ctx, externalId, string(mappedStatus))
+	err = u.paymentTopic.PublishPaymentStatus(ctx, externalId, string(mappedStatus))
 	if err != nil {
 		return utils.HTTPInternalServerError("failed to publish payment status")
 	}

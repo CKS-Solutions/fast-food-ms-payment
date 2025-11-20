@@ -14,57 +14,84 @@ type GeneratePaymentUseCase struct {
 	paymentRepo      ports.PaymentRepository
 	generateTokenMP  ports.MercadoPagoGenerateToken
 	generateQRCodeMP ports.MercadoPagoGenerateQRCode
+	paymentTopic     ports.PaymentTopic
 }
 
 func NewGeneratePaymentUseCase(
 	paymentRepo ports.PaymentRepository,
 	generateTokenMP ports.MercadoPagoGenerateToken,
 	generateQRCodeMP ports.MercadoPagoGenerateQRCode,
+	paymentTopic ports.PaymentTopic,
 ) *GeneratePaymentUseCase {
 	return &GeneratePaymentUseCase{
 		paymentRepo:      paymentRepo,
 		generateTokenMP:  generateTokenMP,
 		generateQRCodeMP: generateQRCodeMP,
+		paymentTopic:     paymentTopic,
 	}
 }
 
-func (u *GeneratePaymentUseCase) Execute(ctx context.Context, input dto.GeneratePaymentInputDTO) (dto.GeneratePaymentOutputDTO, error) {
+func (u *GeneratePaymentUseCase) Execute(ctx context.Context, input dto.GeneratePaymentInputDTO) error {
+	if input.ExternalId == "" {
+		_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "missing external ID")
+		return nil
+	}
+
+	if input.Amount <= 0 {
+		_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "missing amount")
+		return nil
+	}
+
+	if input.Description == "" {
+		_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "missing description")
+		return nil
+	}
+
 	payment, err := u.paymentRepo.GetByExternalId(ctx, input.ExternalId)
 	if err != nil {
-		return dto.GeneratePaymentOutputDTO{}, utils.HTTPInternalServerError("failed to get payment by external ID")
+		_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "failed to get payment by external ID")
+		return utils.HTTPInternalServerError("failed to get payment by external ID")
 	}
 
 	if payment.Id != "" {
 		if payment.Status == entities.PaymentStatus_Paid {
-			return dto.GeneratePaymentOutputDTO{}, utils.HTTPConflict("payment already paid")
+			_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "payment already paid")
+			return utils.HTTPConflict("payment already paid")
 		}
 
 		if time.Unix(payment.ExpiresAt, 10).After(time.Now()) {
-			return dto.GeneratePaymentOutputDTO{Code: payment.Code}, nil
+			_ = u.paymentTopic.PublishPaymentCreationSuccess(ctx, input.ExternalId, payment.Code)
+			return nil
 		}
 
 		err := u.paymentRepo.Delete(ctx, payment.ExternalId)
 		if err != nil {
-			return dto.GeneratePaymentOutputDTO{}, utils.HTTPInternalServerError("failed to delete expired payment")
+			_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "failed to delete expired payment")
+			return utils.HTTPInternalServerError("failed to delete expired payment")
 		}
 	}
 
 	token, err := u.generateTokenMP.GenerateToken(ctx)
 	if err != nil {
-		return dto.GeneratePaymentOutputDTO{}, utils.HTTPPreconditionFailed("failed to generate MercadoPago token")
+		_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "failed to generate MercadoPago token")
+		return utils.HTTPPreconditionFailed("failed to generate MercadoPago token")
 	}
 
 	qrCode, err := u.generateQRCodeMP.GenerateQRCode(ctx, input.ExternalId, input.Amount, input.Description, token)
 	if err != nil {
-		return dto.GeneratePaymentOutputDTO{}, utils.HTTPPreconditionFailed("failed to generate MercadoPago QR Code")
+		_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "failed to generate MercadoPago QR Code")
+		return utils.HTTPPreconditionFailed("failed to generate MercadoPago QR Code")
 	}
 
 	newPayment := entities.NewPayment(input.ExternalId, input.Amount, input.Description, qrCode)
 
 	err = u.paymentRepo.Create(ctx, *newPayment)
 	if err != nil {
-		return dto.GeneratePaymentOutputDTO{}, utils.HTTPInternalServerError("failed to create new payment")
+		_ = u.paymentTopic.PublishPaymentCreationFailure(ctx, input.ExternalId, "failed to create new payment")
+		return utils.HTTPInternalServerError("failed to create new payment")
 	}
 
-	return dto.GeneratePaymentOutputDTO{Code: newPayment.Code}, nil
+	_ = u.paymentTopic.PublishPaymentCreationSuccess(ctx, input.ExternalId, newPayment.Code)
+
+	return nil
 }
