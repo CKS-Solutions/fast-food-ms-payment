@@ -25,7 +25,7 @@ func NewPaymentSNS(client *infra_aws.SNSClient) ports.PaymentTopic {
 type PaymentTopicType string
 
 const (
-	PaymentTopicTypeStatus          PaymentTopicType = "payment_status"
+	PaymentTopicTypeStatusUpdate    PaymentTopicType = "payment_status_update"
 	PaymentTopicTypeCreationSuccess PaymentTopicType = "payment_creation_success"
 	PaymentTopicTypeCreationFailure PaymentTopicType = "payment_creation_failure"
 )
@@ -36,7 +36,7 @@ func (p *PaymentSNS) PublishPaymentStatus(ctx context.Context, externalId string
 		ExternalId string           `json:"external_id"`
 		Status     string           `json:"status"`
 	}{
-		Type:       PaymentTopicTypeStatus,
+		Type:       PaymentTopicTypeStatusUpdate,
 		ExternalId: externalId,
 		Status:     status,
 	}
