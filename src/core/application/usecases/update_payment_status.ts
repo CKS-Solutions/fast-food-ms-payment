@@ -6,10 +6,10 @@ import { PaymentStatus } from "@entities/payment.types"
 import { IPaymentTopic } from "@ports/payment_topic"
 
 export class UpdatePaymentStatusUseCase {
-	private paymentRepository: IPaymentRepository
-	private generateTokenMP: IMercadoPagoGenerateToken
-	private getPaymentMP: IMercadoPagoGetPayment
-	private paymentTopic: IPaymentTopic
+	private readonly paymentRepository: IPaymentRepository
+	private readonly generateTokenMP: IMercadoPagoGenerateToken
+	private readonly getPaymentMP: IMercadoPagoGetPayment
+	private readonly paymentTopic: IPaymentTopic
 
 	constructor(
 		paymentRepository: IPaymentRepository,

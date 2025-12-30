@@ -4,7 +4,7 @@ import { LambdaClientWrapper } from "@aws/lambda_client";
 import { ILambdaAdapter } from "@ports/lambda";
 
 export class LambdaAdapter implements ILambdaAdapter {
-  private lambdaClient: LambdaClientWrapper;
+  private readonly lambdaClient: LambdaClientWrapper;
 
   constructor(lambdaClient: LambdaClientWrapper) {
     this.lambdaClient = lambdaClient;

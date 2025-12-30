@@ -3,7 +3,7 @@ import { IPaymentRepository } from "@ports/payment_repository"
 import { HTTPNotFound } from "@utils/http"
 
 export class CheckPaymentStatusUseCase {
-	private paymentRepository: IPaymentRepository
+	private readonly paymentRepository: IPaymentRepository
 
 	constructor(paymentRepository: IPaymentRepository) {
 		this.paymentRepository = paymentRepository

@@ -13,34 +13,28 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 		const container = new WebhookOrchestratorMPContainerFactory(region, stage)
 
-		switch (topic) {
-			case "payment": {
-				const paymentId = event.queryStringParameters?.["id"]
-				const externalId = event.queryStringParameters?.["external_id"]
-				if (!paymentId || !externalId) {
-					console.log("Missing payment ID or external ID")
-					break
-				}
-
-				await container.lambdaAdapter.invokeEvent(
-					`ms-payment-${stage}-updatePaymentStatus`,
-					{
-						external_id: externalId,
-						payment_id: paymentId,
-					},
-				)
-
-				break
+		if (topic === 'payment') {
+			const paymentId = event.queryStringParameters?.["id"]
+			const externalId = event.queryStringParameters?.["external_id"]
+			if (!paymentId || !externalId) {
+				console.log("Missing payment ID or external ID")
 			}
 
-			default:
-				console.log("Unhandled topic:", topic)
+			await container.lambdaAdapter.invokeEvent(
+				`ms-payment-${stage}-updatePaymentStatus`,
+				{
+					external_id: externalId,
+					payment_id: paymentId,
+				},
+			)
+
+			return new HTTPSuccessResponse(null).toLambdaResponse()
 		}
 
-		
+		console.log("Unhandled topic:", topic)
+		return new HTTPSuccessResponse(null).toLambdaResponse()
 	} catch (error) {
 		console.error("Unexpected error:", error)
-	} finally {
 		return new HTTPSuccessResponse(null).toLambdaResponse()
 	}
 }

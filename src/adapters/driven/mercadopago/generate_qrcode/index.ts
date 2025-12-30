@@ -10,7 +10,7 @@ import { SMClientWrapper } from "@aws/sm_client";
 const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000;
 
 export class MercadoPagoGenerateQRCode implements IMercadoPagoGenerateQRCode {
-  private smClient: SMClientWrapper;
+  private readonly smClient: SMClientWrapper;
 
   constructor(smClient: SMClientWrapper) {
     this.smClient = smClient;

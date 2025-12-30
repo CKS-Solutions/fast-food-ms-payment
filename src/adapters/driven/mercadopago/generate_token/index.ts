@@ -8,7 +8,7 @@ import { BASE_URL, CREDENTIALS_SECRET_ID } from "../utils";
 import { SMClientWrapper } from "@aws/sm_client";
 
 export class MercadoPagoGenerateToken implements IMercadoPagoGenerateToken {
-  private smClient: SMClientWrapper;
+  private readonly smClient: SMClientWrapper;
 
   constructor(smClient: SMClientWrapper) {
     this.smClient = smClient;

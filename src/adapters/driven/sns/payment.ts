@@ -13,7 +13,7 @@ import {
 } from "./payment.types"
 
 export class PaymentSNS implements IPaymentTopic {
-	constructor(private client: SNSClientWrapper) {}
+	constructor(private readonly client: SNSClientWrapper) {}
 
 	private getTopicArn(): string {
 		const arn = process.env.PAYMENT_TOPIC_ARN

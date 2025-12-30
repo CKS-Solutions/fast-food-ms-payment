@@ -24,7 +24,7 @@ function lambdaResponse(
 }
 
 export class HTTPError extends Error {
-	private statusCode: number
+	private readonly statusCode: number
 
 	constructor(message: string, statusCode: number) {
 		super(message)

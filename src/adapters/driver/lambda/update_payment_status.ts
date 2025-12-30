@@ -9,7 +9,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 		console.log('event body type', typeof event.body);
 		console.log('event body', event.body);
 		
-		const body = typeof event.body === 'string' ? JSON.parse(event.body || "{}") : event.body || {}
+		const body = typeof event.body === 'string' ? JSON.parse(event.body ?? "{}") : event.body ?? {}
 
 		const externalId = body.external_id
 		if (!externalId) {

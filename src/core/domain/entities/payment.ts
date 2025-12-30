@@ -15,7 +15,18 @@ export class Payment {
 	created_at: number
 	updated_at: number
 
-	constructor(
+	constructor({
+		id,
+		externalId,
+		status,
+		method,
+		description,
+		value,
+		code,
+		expiresAt,
+		createdAt,
+		updatedAt,
+	}: {
 		id: string,
 		externalId: string,
 		status: PaymentStatus,
@@ -26,7 +37,7 @@ export class Payment {
 		expiresAt: number,
 		createdAt: number,
 		updatedAt: number,
-	) {
+	}) {
 		this.id = id
 		this.external_id = externalId
 		this.status = status
@@ -40,17 +51,17 @@ export class Payment {
 	}
 
 	static create(externalId: string, value: number, description: string, code: string): Payment {
-		return new Payment(
-			randomUUID(),
+		return new Payment({
+			id: randomUUID(),
 			externalId,
-			PaymentStatus.Pending,
-			PaymentMethod.Pix,
+			status: PaymentStatus.Pending,
+			method: PaymentMethod.Pix,
 			description,
 			value,
 			code,
-			Date.now() + DEFAULT_PAYMENT_EXPIRES_IN_SECONDS,
-			Date.now(),
-			Date.now(),
-		)
+			expiresAt: Date.now() + DEFAULT_PAYMENT_EXPIRES_IN_SECONDS,
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
+		})
 	}
 }

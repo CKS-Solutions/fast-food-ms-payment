@@ -7,10 +7,10 @@ import { IPaymentTopic } from "@ports/payment_topic"
 import { Payment } from "@entities/payment"
 
 export class GeneratePaymentUseCase {
-	private paymentRepository: IPaymentRepository
-	private generateTokenMP: IMercadoPagoGenerateToken
-	private generateQRCodeMP: IMercadoPagoGenerateQRCode
-	private paymentTopic: IPaymentTopic
+	private readonly paymentRepository: IPaymentRepository
+	private readonly generateTokenMP: IMercadoPagoGenerateToken
+	private readonly generateQRCodeMP: IMercadoPagoGenerateQRCode
+	private readonly paymentTopic: IPaymentTopic
 
 	constructor(
 		paymentRepository: IPaymentRepository,
