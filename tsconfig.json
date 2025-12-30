@@ -22,7 +22,6 @@
     "paths": {
       "@entities/*": ["./src/core/domain/entities/*"],
       "@usecases/*": ["./src/core/application/usecases/*"],
-      "@controllers/*": ["./src/adapters/driver/controllers/*"],
       "@ports/*": ["./src/core/domain/ports/*"],
       "@dto/*": ["./src/adapters/driver/dto/*"],
       "@aws/*": ["./src/infra/aws/*"],

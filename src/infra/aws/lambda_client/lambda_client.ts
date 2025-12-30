@@ -1,5 +1,5 @@
 import { LambdaClient } from "@aws-sdk/client-lambda"
-import { AwsRegion, AwsStage, newAwsConfig } from "./utils"
+import { AwsRegion, AwsStage, newAwsConfig } from "../utils"
 
 export class LambdaClientWrapper extends LambdaClient {
 	constructor(region: AwsRegion, stage: AwsStage) {

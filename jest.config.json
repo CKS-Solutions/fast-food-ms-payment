@@ -1,0 +1,22 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".test.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@aws/(.*)$": "<rootDir>/src/infra/aws/$1",
+    "^@di/(.*)$": "<rootDir>/src/infra/di/$1",
+    "^@driven_dynamodb/(.*)$": "<rootDir>/src/adapters/driven/dynamodb/$1",
+    "^@driven_mercadopago/(.*)$": "<rootDir>/src/adapters/driven/mercadopago/$1",
+    "^@driven_lambda/(.*)$": "<rootDir>/src/adapters/driven/lambda/$1",
+    "^@driven_sns/(.*)$": "<rootDir>/src/adapters/driven/sns/$1",
+    "^@usecases/(.*)$": "<rootDir>/src/core/application/usecases/$1",
+    "^@entities/(.*)$": "<rootDir>/src/core/domain/entities/$1",
+    "^@ports/(.*)$": "<rootDir>/src/core/application/ports/$1",
+    "^@utils/(.*)$": "<rootDir>/src/utils/$1",
+    "^@dto/(.*)$": "<rootDir>/src/adapters/driver/dto/$1"
+  }
+}
