@@ -3,35 +3,72 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: go1.x
+  runtime: nodejs20.x
   stage: ${opt:stage, 'api'}
   region: us-east-1
   environment:
     REGION: ${self:provider.region}
     STAGE: ${self:provider.stage}
     PAYMENT_TOPIC_ARN:
-      Ref: PaymentTopic
+      Ref: CKSPaymentTopic
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            Fn::GetAtt:
+              - CKSPaymentsTable
+              - Arn
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource:
+            Ref: CKSPaymentTopic
+        - Effect: Allow
+          Action:
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueAttributes
+          Resource:
+            Fn::GetAtt:
+              - CKSPaymentQueue
+              - Arn
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+          Resource: "*"
 
 package:
   individually: true
-  patterns:
-    - '!./**'
-    - 'bin/**'
+  excludeDevDependencies: true
+  exclude:
+    - node_modules/@aws-sdk/**
+    - node_modules/**/@aws-sdk/**
 
 functions:
   generatePayment:
-    handler: bin/generatePayment
+    handler: src/adapters/driver/lambda/generate_payment.handler
     memorySize: 128
     events:
       - sqs:
           arn:
             Fn::GetAtt:
-              - PaymentQueue
+              - CKSPaymentQueue
               - Arn
           batchSize: 1
 
   checkPaymentStatus:
-    handler: bin/checkPaymentStatus
+    handler: src/adapters/driver/lambda/check_payment_status.handler
     memorySize: 128
     events:
       - http:
@@ -39,23 +76,30 @@ functions:
           method: GET
 
   updatePaymentStatus:
-    handler: bin/updatePaymentStatus
+    handler: src/adapters/driver/lambda/update_payment_status.handler
     memorySize: 128
 
   webhookOrchestratorMP:
-    handler: bin/webhookOrchestratorMP
+    handler: src/adapters/driver/lambda/webhook_orchestrator_mp.handler
     memorySize: 128
     events:
       - http:
           path: /v1/mercadopago/webhook
           method: POST
 
+  fakeSubscriber:
+    handler: src/adapters/driver/lambda/fake_subscriber.handler
+    memorySize: 128
+    events:
+      - sns:
+          arn: arn:aws:sns:${self:provider.region}:${aws:accountId}:CKSPaymentTopic-${self:provider.stage}
+
 resources:
   Resources:
-    PaymentsTable:
+    CKSPaymentsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: Payments
+        TableName: CKS.Payments
         AttributeDefinitions:
           - AttributeName: external_id
             AttributeType: S
@@ -64,17 +108,19 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
-    PaymentTopic:
+    CKSPaymentTopic:
       Type: AWS::SNS::Topic
       Properties:
-        TopicName: PaymentTopic
+        TopicName: CKSPaymentTopic-${self:provider.stage}
 
-    PaymentQueue:
+    CKSPaymentQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: PaymentQueue
+        QueueName: CKSPaymentQueue-${self:provider.stage}
 
 plugins:
+  - serverless-esbuild
+  - serverless-prune-plugin
   - serverless-localstack
 
 custom:
@@ -83,6 +129,8 @@ custom:
       - local
     host: http://localhost
     edgePort: 4566
-    lambda:
-      executor: docker-reuse
     autostart: false
+  esbuild:
+    bundle: true
+    minify: true
+    target: node20
