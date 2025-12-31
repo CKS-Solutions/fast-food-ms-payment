@@ -1,7 +1,7 @@
 import { MercadoPagoGenerateQRCode } from "@driven_mercadopago/generate_qrcode"
 import { MercadoPagoGenerateToken } from "@driven_mercadopago/generate_token"
 import { PaymentRepository } from "@driven_dynamodb/payment_repository"
-import { GeneratePaymentUseCase } from "@usecases/generate_payment"
+import { GeneratePaymentUseCase } from "@usecases/generate_payment/generate_payment"
 import { DynamoDBClientWrapper } from "@aws/dynamodb_client"
 import { SNSClientWrapper } from "@aws/sns_client"
 import { AwsRegion, AwsStage } from "@aws/utils"

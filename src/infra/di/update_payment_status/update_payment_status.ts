@@ -1,5 +1,5 @@
 import { MercadoPagoGenerateToken } from "@driven_mercadopago/generate_token"
-import { UpdatePaymentStatusUseCase } from "@usecases/update_payment_status"
+import { UpdatePaymentStatusUseCase } from "@usecases/update_payment_status/update_payment_status"
 import { PaymentRepository } from "@driven_dynamodb/payment_repository"
 import { MercadoPagoGetPayment } from "@driven_mercadopago/get_payment"
 import { DynamoDBClientWrapper } from "@aws/dynamodb_client"
