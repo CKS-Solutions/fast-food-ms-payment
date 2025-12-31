@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --silent",
     "test:watch": "jest --watch --silent",
     "test:cov": "jest --coverage --silent",
     "build": "tsc"
