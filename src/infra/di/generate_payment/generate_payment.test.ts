@@ -40,7 +40,7 @@ import { PaymentRepository } from '@driven_dynamodb/payment_repository'
 import { MercadoPagoGenerateToken } from '@driven_mercadopago/generate_token'
 import { MercadoPagoGenerateQRCode } from '@driven_mercadopago/generate_qrcode'
 import { PaymentSNS } from '@driven_sns/payment'
-import { GeneratePaymentUseCase } from '@usecases/generate_payment/generate_payment'
+import { GeneratePaymentUseCase } from '@usecases/generate_payment'
 
 describe('GeneratePaymentContainerFactory', () => {
   const region = AwsRegion.USEast1

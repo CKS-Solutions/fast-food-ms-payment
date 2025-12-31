@@ -18,6 +18,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 			const externalId = event.queryStringParameters?.["external_id"]
 			if (!paymentId || !externalId) {
 				console.log("Missing payment ID or external ID")
+				return new HTTPSuccessResponse(null).toLambdaResponse()
 			}
 
 			await container.lambdaAdapter.invokeEvent(
