@@ -29,7 +29,19 @@ describe('UpdatePaymentStatus Lambda', () => {
     expect(JSON.parse(response.body)).toEqual({ message: 'missing payment_id in path parameters' })
   })
 
-  it('should call usecase.execute and return 200 on success', async () => {
+  it('should call usecase.execute and return 200 on success when body is object', async () => {
+    const body = { external_id: 'ext-123', payment_id: 'pay-123' }
+    const event = { body } as any
+
+    mockExecute.mockResolvedValue({ status: 'paid' })
+
+    const response = await handler(event)
+    expect(mockExecute).toHaveBeenCalledWith('pay-123', 'ext-123')
+    expect(response.statusCode).toBe(HTTPStatus.OK)
+    expect(JSON.parse(response.body)).toEqual({ data: { status: 'paid' } })
+  })
+
+  it('should call usecase.execute and return 200 on success when body is JSON string', async () => {
     const body = { external_id: 'ext-123', payment_id: 'pay-123' }
     const event = { body: JSON.stringify(body) } as any
 
@@ -38,7 +50,19 @@ describe('UpdatePaymentStatus Lambda', () => {
     const response = await handler(event)
     expect(mockExecute).toHaveBeenCalledWith('pay-123', 'ext-123')
     expect(response.statusCode).toBe(HTTPStatus.OK)
-    expect(JSON.parse(response.body)).toEqual({ data: { status: 'paid' } })
+  })
+
+  describe('body parsing edge cases', () => {
+    test.each([
+      { desc: 'empty string', body: '' },
+      { desc: 'undefined', body: undefined },
+      { desc: 'invalid JSON string', body: '{invalidJson}' },
+    ])('should handle $desc body as empty object and return 400', async ({ body }) => {
+      const event = { body } as any
+      const response = await handler(event)
+      expect(response.statusCode).toBe(HTTPStatus.BadRequest)
+      expect(JSON.parse(response.body)).toEqual({ message: 'request body is required' })
+    })
   })
 
   it('should return 500 on unexpected error', async () => {
