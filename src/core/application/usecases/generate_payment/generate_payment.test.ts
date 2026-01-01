@@ -46,21 +46,6 @@ describe('GeneratePaymentUseCase', () => {
     description: 'Teste',
   }
 
-  it('should fail if external_id is missing', async () => {
-    await useCase.execute({ ...baseParams, external_id: '' })
-    expect(paymentTopic.publishPaymentCreationFailure).toHaveBeenCalledWith('', 'missing external ID')
-  })
-
-  it('should fail if amount <= 0', async () => {
-    await useCase.execute({ ...baseParams, amount: 0 })
-    expect(paymentTopic.publishPaymentCreationFailure).toHaveBeenCalledWith('ext-123', 'missing amount')
-  })
-
-  it('should fail if description is missing', async () => {
-    await useCase.execute({ ...baseParams, description: '' })
-    expect(paymentTopic.publishPaymentCreationFailure).toHaveBeenCalledWith('ext-123', 'missing description')
-  })
-
   it('should fail if payment already paid', async () => {
     paymentRepository.getByExternalId.mockResolvedValue({ status: PaymentStatus.Paid })
     await useCase.execute(baseParams)

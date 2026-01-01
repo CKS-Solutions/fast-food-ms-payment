@@ -28,6 +28,7 @@
       "@driven_dynamodb/*": ["./src/adapters/driven/dynamodb/*"],
       "@driven_mercadopago/*": ["./src/adapters/driven/mercadopago/*"],
       "@driven_sns/*": ["./src/adapters/driven/sns/*"],
+      "@driven_sqs/*": ["./src/adapters/driven/sqs/*"],
       "@driven_lambda/*": ["./src/adapters/driven/lambda/*"],
       "@di/*": ["./src/infra/di/*"],
       "@utils/*": ["./src/utils/*"],

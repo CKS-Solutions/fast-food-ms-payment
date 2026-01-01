@@ -6,9 +6,6 @@ import { getRegion, getStage } from "@utils/env"
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
 	try {
-		console.log('event body type', typeof event.body);
-		console.log('event body', event.body);
-		
 		if (!event.body) {
 			throw new HTTPBadRequest("request body is required")
 		}
@@ -22,7 +19,6 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 		}
 
 		const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body
-
 		const externalId = body.external_id
 		if (!externalId) {
 			throw new HTTPBadRequest("missing external_id in path parameters")

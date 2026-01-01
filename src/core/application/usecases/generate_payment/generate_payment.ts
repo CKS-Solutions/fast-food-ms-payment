@@ -25,21 +25,6 @@ export class GeneratePaymentUseCase {
 	}
 
 	async execute(params: GeneratePaymentInputDTO): Promise<void> {
-		if (!params.external_id) {
-			await this.paymentTopic.publishPaymentCreationFailure(params.external_id, "missing external ID")
-			return
-		}
-
-		if (params.amount <= 0) {
-			await this.paymentTopic.publishPaymentCreationFailure(params.external_id, "missing amount")
-			return
-		}
-
-		if (!params.description) {
-			await this.paymentTopic.publishPaymentCreationFailure(params.external_id, "missing description")
-			return
-		}
-
 		const existingPayment = await this.paymentRepository.getByExternalId(params.external_id)
 		if (existingPayment) {
 			if (existingPayment.status === PaymentStatus.Paid) {
