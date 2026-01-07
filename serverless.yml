@@ -128,6 +128,13 @@ resources:
       Properties:
         QueueName: CKSPaymentQueue-${self:provider.stage}
 
+  Outputs:
+    CKSPaymentTopicArn:
+      Value:
+        Ref: CKSPaymentTopic
+      Export:
+        Name: cks-payment-topic-arn
+
 plugins:
   - serverless-esbuild
   - serverless-prune-plugin
