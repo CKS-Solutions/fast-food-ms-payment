@@ -6,6 +6,10 @@
     "test": "jest --silent",
     "test:watch": "jest --watch --silent",
     "test:cov": "jest --coverage --silent",
+    "deploy": "npx sls deploy",
+    "deploy:local": "npx sls deploy --stage local",
+    "remove": "npx sls remove",
+    "remove:local": "npx sls remove --stage local",
     "build": "tsc"
   },
   "keywords": [],
