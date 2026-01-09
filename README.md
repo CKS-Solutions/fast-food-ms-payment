@@ -10,6 +10,10 @@ Serviço integrado com Mercado Pago para criação de Pagamentos dos pedidos ger
 
 <img width="704" height="469" alt="image" src="https://github.com/user-attachments/assets/7dbc9444-b797-4133-82a0-c7ba2d6eead9" />
 
+### Evidencia de testes Sonar
+
+<img width="1919" height="910" alt="image" src="https://github.com/user-attachments/assets/7259739b-e64b-4a68-99e4-6e8d10fedfe9" />
+
 ### Estrutura de arquivos
 
 ```
